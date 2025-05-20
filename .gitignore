@@ -1,0 +1,4 @@
+.idea/
+/.env.local
+/docker-compose.ovveride.yaml
+/docker-compose.ovveride.yml

@@ -1,0 +1,41 @@
+name: adguard
+
+services:
+    adguard:
+        image: adguard/adguardhome:v0.107.60
+        container_name: adguard
+        restart: unless-stopped
+        networks:
+            - app-net
+        expose:
+            - "53"
+            - "80"
+            - "443"
+            - "853"
+            - "3000"
+        ports:
+            - "53:53/tcp"
+            - "53:53/udp"
+        volumes:
+            - ./etc/config:/opt/adguardhome/conf:rw
+            - db-data:/opt/adguardhome/work:rw
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=app-net"
+            - "traefik.http.routers.adguard.entrypoints=https"
+            - "traefik.http.routers.adguard.rule=Host(`${APP_HOST}`)"
+            - "traefik.http.routers.adguard.tls=true"
+            - "traefik.http.routers.adguard.service=adguard"
+            - "traefik.http.services.adguard.loadBalancer.server.port=443"
+            - "traefik.http.services.adguard.loadBalancer.server.scheme=https"
+            - "traefik.http.routers.adguard-init.entrypoints=https"
+            - "traefik.http.routers.adguard-init.rule=Host(`${APP_INIT_HOST}`)"
+            - "traefik.http.routers.adguard-init.tls=true"
+            - "traefik.http.routers.adguard-init.service=adguard-init"
+            - "traefik.http.services.adguard-init.loadBalancer.server.port=3000"
+networks:
+    app-net:
+        external: true
+
+volumes:
+    db-data:
